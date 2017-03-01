@@ -58,7 +58,7 @@ class PoolsCtrl:
         ceph_rest_api_subfolder = ceph_rest_api_subfolder.strip('/')
         if ceph_rest_api_subfolder != '':
             ceph_rest_api_subfolder = "/" + ceph_rest_api_subfolder
-        self.cephRestApiUrl = "http://"+conf.get("ceph_rest_api", "")+ceph_rest_api_subfolder+"/api/v0.1/"
+        self.cephRestApiUrl = "http://"+conf.get("ceph_rest_api", "")+ceph_rest_api_subfolder+"/"
         pass
 
     def getCephRestApiUrl(self):
