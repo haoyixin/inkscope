@@ -149,5 +149,7 @@ rm -rf $RPM_BUILD_ROOT
 %files monitoring
 %defattr(-,root,root)
 /opt/inkscope/lib/libmongojuice.py
+/opt/inkscope/lib/libmongojuice.pyc
+/opt/inkscope/lib/libmongojuice.pyo
 /opt/nrpe/libexec/*
 /opt/nrpe/etc/nrpeceph.cfg
