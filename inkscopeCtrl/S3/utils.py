@@ -62,7 +62,7 @@ def headers_metadata(headers):
     return dict((h[11:], v) for h, v in headers.iteritems()
                             if h.lower().startswith("x-amz-meta-"))
 
-iso8601_fmt = '%Y-%m-%dT%H:%M:%S.000Z'
+iso8601_fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 def _iso8601_dt(v): return datetime.datetime.strptime(v, iso8601_fmt)
 def rfc822_fmtdate(t=None):

@@ -56,7 +56,7 @@ StatusApp.controller("statusCtrl", function ($rootScope, $scope, $http , $cookie
         element: document.getElementById('y_axis')
     });
     yAxis.render();
-    graph.render();
+    // graph.render();
 
     //refresh data every x seconds
     refreshData();
@@ -357,7 +357,7 @@ StatusApp.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $htt
                     var id = RegExp.$1;
                     if (id != null){
                         //$scope.details[i] = txt.replace(id,"<a href='pg.html?id="+id+"'>"+id+"</a>");
-                        txt = txt.replace("pg "+id,"<a href='../ceph-rest-api/tell/"+id+"/query.json'>pg "+id+"</a>");
+                        txt = txt.replace("pg "+id,"<a href='../inkscopeCtrl/ceph-rest-api/tell/"+id+"/query.json'>pg "+id+"</a>");
                         }
                      // ceph-rest-api/tell/<id>/query.json
                     $scope.details[i] = txt;

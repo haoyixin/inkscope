@@ -78,17 +78,17 @@
     </div>
     <h1>{{osd.node.name}}</h1>
     <strong>{{osdState(osd)}}</strong>
-    <br><br>
+    <br>
 
-    <div id="osdStatGraph"><svg style="height:180px;width:100%"></svg></div>
-    last control : {{osd.lastControl|duration}}<br>
-    reweight : {{osd.reweight }}<br>
-    {{osd.partition._id}}<br>
+    <!--div id="osdStatGraph"><svg style="height:180px;width:100%"></svg></div-->
+    <!last control : {{osd.lastControl|duration}}<br>
+    weight : {{osd.reweight }}<br>
+    <!{{osd.partition._id}}<br>
     {{osd.public_addr}}<br>
-    <ad-gauge value="osd.partition.stat.used/osd.partition.stat.total" colormode="desc" width="241"></ad-gauge>
-    <div class="gaugeLegend">
+    <!--ad-gauge value="osd.partition.stat.used/osd.partition.stat.total" colormode="desc" width="241"></ad-gauge-->
+    <!--div class="gaugeLegend">
         {{osd.partition.stat.used| bytes}} used <br>on {{osd.partition.stat.total| bytes}}
-    </div>
+    </div-->
 
     <div ng-show="hasRole('admin')">
         <hr>
@@ -98,7 +98,7 @@
             <a class="btn btn-warning" ng-hide="osd.stat.up == false" ng-click="osdDown(selectedOsd)"><i class="icon-white icon-arrow-down"></i> down</a>
             <a href="monitorOSD.html#/osd/osd-{{osd.node._id}}" class="btn btn-info" ng-show="useInfluxDB"><i class="fa fa-line-chart"></i> Monitor</a>
         </div>
-        <div>
+        <div align="center">
             <hr>
             <input ng-model="reweight" id="reweight" type="text">
             <a class="btn btn-warning btn-small" ng-click="osdReweight(selectedOsd)"><i class="fa fa-balance-scale"></i> Reweight</a>
@@ -117,9 +117,9 @@
     <div class="filter clickable" ng-hide="!downFilter" ng-click="removeFilter('down')"> x down</div>
     <div class="notfilter clickable" ng-hide="downFilter" ng-click="addFilter('down')"> + down</div>
 </div>
-<br style="clear: both">
+<!--br style="clear: both">
     <div style="margin-left:10px">Minimum fill rate <span style="width:30px;display:inline-block">{{minUsedSpace}}%</span> <input type="range" ng-model="minUsedSpace"></div>
-<br>
+<br-->
 <div id="datePanel"><br>Date : {{date | date:'HH:mm:ss'}} - matching: {{count}} of {{nbOsd}} OSD
     <div ng-hide="osdControl<15 || count == 0">
         <a href="probes.html">
@@ -136,13 +136,13 @@
             <div> <!-- tooltip -->
                 <span>
                     <strong>{{osd.node.name}}</strong> {{osdState(osd)}}<br>
-                    last control : {{osd.lastControl|duration}}<br><br>
-                    {{osd.partition._id}}<br>
+                    <!last control : {{osd.lastControl|duration}}<br>
+                    <!{{osd.partition._id}}<br>
                     {{osd.public_addr}}<br>
-                    reweight : {{(1*osd.stat.weight).toString()}}<br>
-                    free : {{osd.partition.stat.free|bytes}}<br>
-                    used : {{osd.partition.stat.used|bytes}}<br>
-                    total: {{osd.partition.stat.total|bytes}}<br>
+                    weight : {{(1*osd.stat.weight).toString()}}<br>
+                    <!free : {{osd.partition.stat.free|bytes}}<br>
+                    <!used : {{osd.partition.stat.used|bytes}}<br>
+                    <!total: {{osd.partition.stat.total|bytes}}<br>
                 </span>
             </div>
         </div>

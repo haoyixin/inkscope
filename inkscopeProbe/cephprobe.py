@@ -194,7 +194,7 @@ def leadership(db, hostname):
                   
     
 
-# uri : /api/v0.1/status.json
+# uri : /status.json
 def process_status(restapi, ceph_rest_api_subfolder, db):
     if not isLeader :
         return
@@ -203,7 +203,7 @@ def process_status(restapi, ceph_rest_api_subfolder, db):
     sys.stdout.flush()
     try:
         restapi.connect()
-        restapi.request("GET", ceph_rest_api_subfolder+"/api/v0.1/status.json")
+        restapi.request("GET", ceph_rest_api_subfolder+"/status.json")
         r1=restapi.getresponse()
     except Exception, e:
         print str(datetime.datetime.now()), "-- error (Status) failed to connect to ceph rest api: ", e.message
@@ -315,7 +315,7 @@ def process_status(restapi, ceph_rest_api_subfolder, db):
         return c_status['output']['fsid']
    
 
-# uri : /api/v0.1/osd/dump.json
+# uri : /osd/dump.json
 def process_osd_dump(restapi, ceph_rest_api_subfolder, db):
     if not isLeader :
         return
@@ -324,7 +324,7 @@ def process_osd_dump(restapi, ceph_rest_api_subfolder, db):
     sys.stdout.flush()
     try:
         restapi.connect()
-        restapi.request("GET", ceph_rest_api_subfolder+"/api/v0.1/osd/dump.json")
+        restapi.request("GET", ceph_rest_api_subfolder+"/osd/dump.json")
         r1=restapi.getresponse()
     except Exception, e:
         print str(datetime.datetime.now()), "-- error (OSDDump) failed to connect to ceph rest api: ", e.message
@@ -430,7 +430,7 @@ def process_osd_dump(restapi, ceph_rest_api_subfolder, db):
 
 # osd host from conf : "host" : DBRef( "hosts", hostmap[i]),
 # "partition" : DBRef( "partitions", hostmap[i]+":/dev/sdc1"),
-# uri : /api/v0.1/pg/dump.json
+# uri : /pg/dump.json
 def process_pg_dump(restapi, ceph_rest_api_subfolder, db):
     if not isLeader :
         return
@@ -439,7 +439,7 @@ def process_pg_dump(restapi, ceph_rest_api_subfolder, db):
     sys.stdout.flush()
     try:
         restapi.connect()
-        restapi.request("GET", ceph_rest_api_subfolder+"/api/v0.1/pg/dump.json")
+        restapi.request("GET", ceph_rest_api_subfolder+"/pg/dump.json")
         r1 = restapi.getresponse()
     except Exception, e:
         print str(datetime.datetime.now()), "-- error (PGDump) failed to connect to ceph rest api: ", e.message
@@ -483,7 +483,7 @@ def process_pg_dump(restapi, ceph_rest_api_subfolder, db):
             db.pg.update({'_id' : pg["_id"]}, pg, upsert= True)
 
 
-# uri : /api/v0.1/osd/crush/dump.json
+# uri : /osd/crush/dump.json
 def process_crushmap(restapi, ceph_rest_api_subfolder, db):
     if not isLeader :
         return
@@ -492,7 +492,7 @@ def process_crushmap(restapi, ceph_rest_api_subfolder, db):
     sys.stdout.flush()
     try:
         restapi.connect()
-        restapi.request("GET", ceph_rest_api_subfolder+"/api/v0.1/osd/crush/dump.json")
+        restapi.request("GET", ceph_rest_api_subfolder+"/osd/crush/dump.json")
         r1=restapi.getresponse()
     except Exception, e:
         print str(datetime.datetime.now()), "-- error (Crushmap) failed to connect to ceph rest api: ", e.message
@@ -570,7 +570,7 @@ def process_crushmap(restapi, ceph_rest_api_subfolder, db):
         db.crushmap.update({'_id': crushmap["_id"]}, crushmap, upsert=True)
 
 
-# uri : /api/v0.1/df
+# uri : /df
 def process_df(restapi, ceph_rest_api_subfolder, db):
     if not isLeader :
         return
@@ -579,7 +579,7 @@ def process_df(restapi, ceph_rest_api_subfolder, db):
     sys.stdout.flush()
     try:
         restapi.connect()
-        restapi.request("GET", ceph_rest_api_subfolder+"/api/v0.1/df.json")
+        restapi.request("GET", ceph_rest_api_subfolder+"/df.json")
         r1=restapi.getresponse()
     except Exception, e:
         print str(datetime.datetime.now()), "-- error (DF) failed to connect to ceph rest api: ", e.message

@@ -14,9 +14,19 @@ from hashlib import md5
 from bson.json_util import dumps
 from InkscopeError import InkscopeError
 
+from werkzeug.routing import BaseConverter
+
+class RegexConverter(BaseConverter):
+
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
 version = "1.4.0"
 
 app = Flask(__name__)
+app.url_map.converters['regex'] = RegexConverter
+
 app.secret_key = "Mon Nov 30 17:20:29 2015"
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=14)
 
@@ -32,7 +42,8 @@ from subprocess import CalledProcessError
 import mongoJuiceCore
 
 from poolsCtrl import PoolsCtrl,Pools
-import osdsCtrl
+from osdsCtrl import OsdsCtrl
+from restProxy import RestProxy
 from rbdCtrl import RbdCtrl
 import subprocess
 from StringIO import StringIO
@@ -257,9 +268,12 @@ def conf_manage():
 #
 # inkscope users management
 #
-@app.route('/inkscope_user/', methods=['GET'])
+@app.route('/inkscope_user', methods=['GET'])
+@login_required
 def inkscope_user_list():
-    return Response(dumps(db.inkscope_users.find()))
+    r = Response(dumps(db.inkscope_users.find()))
+    print r
+    return r
 
 
 @app.route('/inkscope_user/<id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -292,7 +306,7 @@ def inkscope_user_manage(id):
         del user['_id']
 
         print 'rep', dumps(user)
-        newuser = db.inkscope_users.replace_one({"name":id}, user)
+        newuser = db.inkscope_users.update({"name":id}, user)
         print 'old', dumps(db.inkscope_users.find_one({"name":id}))
         return Response('ok')
 
@@ -308,6 +322,7 @@ def inkscope_user_manage(id):
 
 
 @app.route('/inkscope_user_role/', methods=['GET'])
+@login_required
 def inkscope_user_role_list():
     roles = ["admin","admin_rgw","admin_rbd","admin_pool","supervizor"]
     return Response(dumps(roles), mimetype='application/json')
@@ -317,11 +332,13 @@ def inkscope_user_role_list():
 # mongoDB query facility
 #
 @app.route('/<db>/<collection>', methods=['GET', 'POST'])
+@login_required
 def find(db, collection):
     return mongoJuiceCore.find(conf, db, collection)
 
 
 @app.route('/<db>', methods=['POST'])
+@login_required
 def full(db):
     return mongoJuiceCore.full(conf, db)
 
@@ -330,6 +347,7 @@ def full(db):
 # Pools management
 #
 @app.route('/poolList/', methods=['GET'])
+@login_required
 def pool_list():
     try:
         return Response(PoolsCtrl(conf).pool_list(), mimetype='application/json')
@@ -339,6 +357,7 @@ def pool_list():
 
 @app.route('/pools/', methods=['GET', 'POST'])
 @app.route('/pools/<int:id>', methods=['GET', 'DELETE', 'PUT'])
+@login_required
 def pool_manage(id=None):
     try:
         return PoolsCtrl(conf).pool_manage(id)
@@ -347,6 +366,7 @@ def pool_manage(id=None):
 
 
 @app.route('/pools/<int:id>/snapshot', methods=['POST'])
+@login_required
 def makesnapshot(id):
     try:
         return PoolsCtrl(conf).makesnapshot(id)
@@ -355,6 +375,7 @@ def makesnapshot(id):
 
 
 @app.route('/pools/<int:id>/snapshot/<namesnapshot>', methods=['DELETE'])
+@login_required
 def removesnapshot(id, namesnapshot):
     try:
         return PoolsCtrl(conf).removesnapshot(id, namesnapshot)
@@ -369,6 +390,7 @@ def removesnapshot(id, namesnapshot):
 # Images
 #
 @app.route('/RBD/images', methods=['GET'])
+@login_required
 def getImagesList():
     # Log.debug("Calling  RbdCtrl(conf).listImages() method")
     try:
@@ -378,6 +400,7 @@ def getImagesList():
 
 
 @app.route('/RBD/images/<string:pool_name>/<string:image_name>', methods=['GET'])
+@login_required
 def getImagesInfo(pool_name, image_name):
     # Log.debug("Calling  RbdCtrl(conf).getImagesInfo() method")
     try:
@@ -387,6 +410,7 @@ def getImagesInfo(pool_name, image_name):
 
 
 @app.route('/RBD/images/<string:pool_name>/<string:image_name>', methods=['PUT'])
+@login_required
 def createImage(pool_name, image_name):
     # Log.debug("Calling  RbdCtrl(conf).listImages() method")
     try:
@@ -396,6 +420,7 @@ def createImage(pool_name, image_name):
 
 
 @app.route('/RBD/images/<string:pool_name>/<string:image_name>/<string:action>', methods=['POST'])
+@login_required
 def modifyImage(pool_name, image_name , action):
     # Log.debug("Calling  RbdCtrl(conf).modifyImages() method")
     try:
@@ -405,6 +430,7 @@ def modifyImage(pool_name, image_name , action):
 
 
 @app.route('/RBD/images/<string:pool_name>/<string:image_name>', methods=['DELETE'])
+@login_required
 def deleteImage(pool_name, image_name):
     # Log.debug("Calling  RbdCtrl(conf).deleteImage() method")
     try:
@@ -417,6 +443,7 @@ def deleteImage(pool_name, image_name):
 # Snapshots
 #
 @app.route('/RBD/snapshots/<string:pool_name>/<string:image_name>/<string:snap_name>', methods=['GET'])
+@login_required
 def infoImageSnapshot(pool_name, image_name,snap_name):
     # Log.debug("Calling  RbdCtrl(conf).info_image_snapshot() method")
     try:
@@ -426,6 +453,7 @@ def infoImageSnapshot(pool_name, image_name,snap_name):
 
 
 @app.route('/RBD/snapshots/<string:pool_name>/<string:image_name>/<string:snap_name>', methods=['PUT'])
+@login_required
 def createImageSnapshot(pool_name, image_name,snap_name):
     # Log.debug("Calling  RbdCtrl(conf).create_image_snapshot() method")
     try:
@@ -435,6 +463,7 @@ def createImageSnapshot(pool_name, image_name,snap_name):
 
 
 @app.route('/RBD/snapshots/<string:pool_name>/<string:image_name>/<string:snap_name>', methods=['DELETE'])
+@login_required
 def deleteImageSnapshot(pool_name, image_name,snap_name):
     # Log.debug("Calling  RbdCtrl(conf).delete_image_snapshot() method")
     try:
@@ -444,6 +473,7 @@ def deleteImageSnapshot(pool_name, image_name,snap_name):
 
 
 @app.route('/RBD/snapshots/<string:pool_name>/<string:image_name>/<string:snap_name>/<string:action>', methods=['POST'])
+@login_required
 def actionOnImageSnapshot(pool_name, image_name,snap_name, action):
     # print "Calling  RbdCtrl(conf).action_on_image_snapshot() method", action
     try:
@@ -468,8 +498,9 @@ def actionOnImageSnapshot(pool_name, image_name,snap_name, action):
 # Osds management
 #
 @app.route('/osds', methods=['PUT'])
+@login_required
 def osds_manage(id=None):
-    return osdsCtrl.osds_manage(id)
+    return OsdsCtrl(conf).osds_manage(id)
 
 
 #
@@ -478,6 +509,7 @@ def osds_manage(id=None):
 # This method return a S3 Object that id is "objId".
 # An exception is trhown if the object does not exist or there an issue
 @app.route('/S3/object', methods=['GET'])
+@login_required
 def getObjectStructure():
     Log.debug("Calling  getObjectStructure() method")
     try:
@@ -488,6 +520,7 @@ def getObjectStructure():
 
 # User management
 @app.route('/S3/user', methods=['GET'])
+@login_required
 def listUser():
     try:
         return Response(S3Ctrl(conf).listUsers(),mimetype='application/json')
@@ -496,6 +529,7 @@ def listUser():
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user', methods=['POST'])
+@login_required
 def createUser():
     try:
         return Response(S3Ctrl(conf).createUser(),mimetype='application/json')
@@ -504,6 +538,7 @@ def createUser():
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>', methods=['GET'])
+@login_required
 def getUser(uid):
     try:
         return Response(S3Ctrl(conf).getUser(uid),mimetype='application/json')
@@ -512,6 +547,7 @@ def getUser(uid):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>', methods=['PUT'])
+@login_required
 def modifyUser(uid):
     try:
         return Response(S3Ctrl(conf).modifyUser(uid),mimetype='application/json')
@@ -520,6 +556,7 @@ def modifyUser(uid):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>', methods=['DELETE'])
+@login_required
 def removeUser(uid):
     try:
         return Response(S3Ctrl(conf).removeUser(uid),mimetype='application/json')
@@ -529,6 +566,7 @@ def removeUser(uid):
 
 
 @app.route('/S3/user/<string:uid>/key/<string:key>', methods=['DELETE'])
+@login_required
 def removeUserKey(uid,key):
     try:
         return Response(S3Ctrl(conf).removeUserKey(uid,key),mimetype='application/json')
@@ -537,6 +575,7 @@ def removeUserKey(uid,key):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>/subuser', methods=['PUT'])
+@login_required
 def createSubuser(uid):
     try:
         return Response(S3Ctrl(conf).createSubuser(uid),mimetype='application/json')
@@ -545,6 +584,7 @@ def createSubuser(uid):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>/subuser/<string:subuser>', methods=['DELETE'])
+@login_required
 def deleteSubuser(uid, subuser):
     try:
         return Response(S3Ctrl(conf).deleteSubuser(uid, subuser),mimetype='application/json')
@@ -554,6 +594,7 @@ def deleteSubuser(uid, subuser):
 
 
 @app.route('/S3/user/<string:uid>/subuser/<string:subuser>/key', methods=['PUT'])
+@login_required
 def createSubuserKey(uid, subuser):
     Log.debug("createSubuserKey")
     try:
@@ -563,6 +604,7 @@ def createSubuserKey(uid, subuser):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>/subuser/<string:subuser>/key', methods=['DELETE'])
+@login_required
 def deleteSubuserKey(uid, subuser):
     Log.debug("deleteSubuserKey")
     try:
@@ -572,6 +614,7 @@ def deleteSubuserKey(uid, subuser):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>/caps', methods=['PUT', 'POST'])
+@login_required
 def saveCapability(uid):
     Log.debug("saveCapability")
     try:
@@ -581,6 +624,7 @@ def saveCapability(uid):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/user/<string:uid>/caps', methods=['DELETE'])
+@login_required
 def deleteCapability(uid):
     Log.debug("deleteCapability")
     try:
@@ -592,6 +636,7 @@ def deleteCapability(uid):
 # bucket management
 
 @app.route('/S3/user/<string:uid>/buckets', methods=['GET'])
+@login_required
 def getUserBuckets(uid,bucket=None):
     try:
         return Response(S3Ctrl(conf).getUserBuckets(uid),mimetype='application/json')
@@ -601,6 +646,7 @@ def getUserBuckets(uid,bucket=None):
 
 
 @app.route('/S3/bucket', methods=['PUT'])
+@login_required
 def createBucket():
     try:
         return Response(S3Ctrl(conf).createBucket(), mimetype='application/json')
@@ -610,6 +656,7 @@ def createBucket():
 
 
 @app.route('/S3/bucket', methods=['GET'])
+@login_required
 def getBuckets():
     try:
         return Response(S3Ctrl(conf).getBucketInfo(None), mimetype='application/json')
@@ -618,6 +665,7 @@ def getBuckets():
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/bucket/<string:bucket>', methods=['GET'])
+@login_required
 def getBucketInfo(bucket=None):
     try:
         return Response(S3Ctrl(conf).getBucketInfo(bucket), mimetype='application/json')
@@ -626,6 +674,7 @@ def getBucketInfo(bucket=None):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/bucket/<string:bucket>', methods=['DELETE'])
+@login_required
 def deleteBucket(bucket):
     try:
         return Response(S3Ctrl(conf).deleteBucket(bucket), mimetype='application/json')
@@ -634,6 +683,7 @@ def deleteBucket(bucket):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/bucket/<string:bucket>/link', methods=['DELETE','PUT'])
+@login_required
 def linkBucket(bucket):
     try:
         uid = request.form['uid']
@@ -646,6 +696,7 @@ def linkBucket(bucket):
         return Response(e.reason, status=e.code)
 
 @app.route('/S3/bucket/<string:bucketName>/list', methods=['GET'])
+@login_required
 def listBucket(bucketName):
     try:
         return Response(S3Ctrl(conf).listBucket(bucketName), mimetype='application/json')
@@ -653,3 +704,17 @@ def listBucket(bucketName):
         Log.err(e.__str__())
         return Response(e.reason, status=e.code)
 
+@app.route('/ceph-rest-api/<regex(".+"):url>', methods=['GET', 'PUT'])
+@login_required
+def proxyReq(url):
+    try:
+        if request.method == 'GET':
+            return RestProxy(conf).proxy_get(url)
+        elif request.method == 'PUT':
+            return RestProxy(conf).proxy_put(url)
+    except S3Error , e:
+        Log.err(e.__str__())
+        return Response(e.reason, status=e.code)
+    pass
+
+# app.run(host='127.0.0.1', port=8081)

@@ -32,7 +32,7 @@ class S3ObjectCtrl:
         ceph_rest_api_subfolder = ceph_rest_api_subfolder.strip('/')
         if ceph_rest_api_subfolder != '':
             ceph_rest_api_subfolder = "/" + ceph_rest_api_subfolder
-        self.cephRestApiUrl = "http://"+conf.get("ceph_rest_api", "")+ceph_rest_api_subfolder+"/api/v0.1/"
+        self.cephRestApiUrl = "http://"+conf.get("ceph_rest_api", "")+ceph_rest_api_subfolder+"/"
         self.inkscopeCtrlUrl = "http://"+conf.get("inkscope_root", "")+"/inkscopeCtrl/"
 
         if not self.radosgw_url.endswith('/'):
@@ -336,6 +336,26 @@ class S3ObjectCtrl:
         # print "OSD LIST Contructed =", osdslist
         return osdslist
 
+    #def executeCmd(self, command, args=[], filters=[]):
+    #    print "___Building unix with = " + command, "___args=" + json.dumps(args), "___filters=" + json.dumps(filters)
+    #    cmd = command
+    #    if len(args):
+    #        i = 0
+    #        while i < len(args):
+    #            cmd = cmd + args[i].replace('(','\(').replace(')','\)')
+    #            i = i + 1
+    #    if len(filters):
+    #        i = 0
+    #        while i < len(filters):
+    #            cmd = cmd + ' |grep ' + filters[i].replace('(','\(').replace(')','\)')
+    #            i = i + 1
+    #    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    #    outdata, errdata = p.communicate()
+    #    if len(errdata):
+    #        raise RuntimeError('unable to execute the command[%s] , Reason= %s' % (cmd, errdata))
+    #    else:
+    #        print "_____Execute Command successful %s", outdata
+    #    return outdata
     def executeCmd(self, command, args=[], filters=[]):
         print "___Building unix with = " + command, "___args=" + json.dumps(args), "___filters=" + json.dumps(filters)
         cmd = command
@@ -349,12 +369,14 @@ class S3ObjectCtrl:
             while i < len(filters):
                 cmd = cmd + ' |grep ' + filters[i].replace('(','\(').replace(')','\)')
                 i = i + 1
+        pt = re.compile(r'^([A-z]+)\s(.+)')
+        cmd = pt.sub(r'\1' + ' -c ' + self.conffile + ' ' + r'\2', cmd)
         p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
         outdata, errdata = p.communicate()
-        if len(errdata):
-            raise RuntimeError('unable to execute the command[%s] , Reason= %s' % (cmd, errdata))
-        else:
-            print "_____Execute Command successful %s", outdata
+        # if p.returncode != 0:
+        #     raise RuntimeError('unable to execute the command[%s] , Reason= %s' % (cmd, errdata))
+        # else:
+        #     print "_____Execute Command successful %s", outdata
         return outdata
 
 # This method returns the name of the pool that hold the bucket which name is passed in argument
@@ -450,16 +472,17 @@ class S3ObjectCtrl:
          # on protege les caracteres speciaux en debut de shadow
          if objectid == chunkBaseName:  # The object has no chunk because it's smaller than 4Mo
                 cmd = 'rados --pool=' + poolName + '   ls|grep ' + bucketId + '|grep ' + '"'+objectid.replace('-','\-')+'"'
-         p = Popen(cmd,
-                        shell=True,
-                        stdout=PIPE,
-                        stderr=PIPE)
-         outdata, errdata = p.communicate()
+         # p = Popen(cmd,
+         #                shell=True,
+         #                stdout=PIPE,
+         #                stderr=PIPE)
+         # outdata, errdata = p.communicate()
+         outdata = self.executeCmd(cmd)
          print("chunks= ")
          print(outdata)
-         print(errdata)
-         if len(errdata) > 0:
-            raise RuntimeError('unable to get the chunks list for the pool % the bucketId %s and the chunkBaseName the manifest %s : %s' % (poolName, bucketId, chunkBaseName, errdata))
+         #print(errdata)
+         # if len(errdata) > 0:
+         #    raise RuntimeError('unable to get the chunks list for the pool % the bucketId %s and the chunkBaseName the manifest %s : %s' % (poolName, bucketId, chunkBaseName, errdata))
 
          return outdata.split('\n')
 

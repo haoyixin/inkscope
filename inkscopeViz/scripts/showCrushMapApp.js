@@ -13,7 +13,7 @@ showCrushMapApp.controller('CrushMapCtrl', function CrushMapCtrl($rootScope, $sc
         .attr("width", $scope.screenSize.x -40)
         .attr("height", $scope.screenSize.y -200);
 
-    var apiURL = '/ceph-rest-api/';
+    var apiURL = '/inkscopeCtrl/ceph-rest-api/';
     $http({method: "get", url: apiURL + "osd/crush/dump.json", cache: $templateCache}).
         success(function (data, status) {
             $rootScope.raw = JSON.stringify(data.output,null,"   ");

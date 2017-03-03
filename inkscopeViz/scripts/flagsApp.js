@@ -4,7 +4,7 @@
 var FlagsApp = angular.module('FlagsApp', ['InkscopeCommons']);
 
 FlagsApp.controller("flagsCtrl", function ($rootScope, $scope, $http, $dialogs) {
-    var apiURL = '/ceph-rest-api/';
+    var apiURL = '/inkscopeCtrl/ceph-rest-api/';
 
     refreshData();
     setInterval(function(){

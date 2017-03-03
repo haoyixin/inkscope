@@ -1,28 +1,29 @@
 <div id="page_header"  ng-controller="overallStatusCtrl">
-    <div id="page_logo"><a href="index.html" title="{{ overallStatus.severity }}: {{ overallStatus.summary }}"><img src="img/inkscope_logo100.png" border="0"></a></div>
+    <div id="page_logo"><a href="index.html" title="{{ overallStatus.severity }}: {{ overallStatus.summary }}"><img src="img/logo.png" border="0" height="100" width="81"></a></div>
     <div id="page_title" class="text_health_status_{{ overallStatus.severity }}">{{ pageTitle }}</div>
     <div id="page_subtitle" class="text_health_status_{{ overallStatus.severity }}">{{ conf.platform }}</div>
     <div id="page_menu">
         <ul id="menu_cat_list" class="nav nav-pills">
             <li id="menu_cat_cluster" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Cluster<span class="caret"></span></a>
                 <ul id="menu_cat_cluster_list"  class="dropdown-menu">
+                    <li><a href="index.html" title="{{ overallStatus.severity }}: {{ overallStatus.summary }}">Status</a></li>
                     <!--li><a href="cluster.html" title="Cluster">Cluster</a-->
-                    <li><a href="hosts.html" title="hosts">Hosts</a></li>
-                    <li><a href="osdFlags.html" title="Cluster general flags">Cluster general flags</a></li>
+                    <!--li><a href="hosts.html" title="hosts">Hosts</a></li-->
+                    <li><a href="osdFlags.html" title="Cluster general flags">General flags</a></li>
                     <li ng-show="useInfluxDB"><a href="monitorCluster.html" title="cluster monitoring">Cluster monitoring</a></li>
                 </ul>
             </li>
             <li id="menu_cat_osd" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">OSD<span class="caret"></span></a>
                 <ul id="menu_cat_osd_list"  class="dropdown-menu">
-                    <li><a href="osds.html" title="all OSDs states with filters">OSDs states</a>
-                    <li><a href="osds.html?dispoMode=space" title="all OSDs used space">OSDs used space</a>
-                    <li><a href="osdMap.html" title="OSDs hierarchical view">OSDs map</a></li>
-                    <li><a href="osdPerf.html" title="OSDs performances">OSDs perf</a></li>
+                    <li><a href="osds.html" title="all OSDs states with filters">States</a>
+                    <!--li><a href="osds.html?dispoMode=space" title="all OSDs used space">Used space</a></li-->
+                    <li><a href="osdMap.html" title="OSDs hierarchical view">Map</a></li>
+                    <li><a href="osdPerf.html" title="OSDs performances">Perf</a></li>
                 </ul>
             </li>
             <li id="menu_cat_pool" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" title="pool usage and pools/pgs/osd">Pool<span class="caret"></span></a>
                 <ul  id="menu_cat_pool_list" class="dropdown-menu">
-                    <li><a href="poolManagement.html" title="pools management">Pool management</a></li>
+                    <li><a href="poolManagement.html" title="pools management">Management</a></li>
                     <li ng-show="useInfluxDB"><a href="monitorPool.html#/pool" title="pool monitoring">Pool monitoring</a></li>
                     <li><a href="poolspgsosds.html" title="shows relationship between pools and osds">Pools/Pgs/osds</a></li>
                 </ul>
@@ -42,21 +43,22 @@
                 <ul id="menu_cat_object_list" class="dropdown-menu">
                     <li><a href="userManagement.html" title="users management">Users</a></li>
                     <li><a href="bucketManagement.html" title="buckets management">Buckets</a></li>
-                    <li><a href="rgwObjectViz.html" title="objects and chunks visualisation">Object visualisation</a></li>
+                    <!--li><a href="rgwObjectViz.html" title="objects and chunks visualisation">Object visualisation</a></li-->
                 </ul>
             </li>
             <li id="menu_cat_fs" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-show="jewel">
-                File systems<span class="caret"></span></a>
+                Cephfs<span class="caret"></span></a>
                 <ul id="menu_cat_fs_list"  class="dropdown-menu">
                     <li><a href="fs.html" title="FS info">FS status</a></li>
+                    <!--li><a href="mds.html" title="MDS cluster info">MDS status</a></li-->
                 </ul>
             </li>
-            <li id="menu_cat_mds" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-show="!jewel">
+            <!--li id="menu_cat_mds" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" ng-show="!jewel">
                 MDS<span class="caret"></span></a>
                 <ul id="menu_cat_mds_list"  class="dropdown-menu">
                     <li><a href="mds.html" title="MDS cluster info">MDS status</a>
                 </ul>
-            </li>
+            </li-->
             <li id="menu_cat_monitoring" class="dropdown" ng-show="useInfluxDB">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" title="Monitoring">Monitoring<span class="caret"></span></a>
                 <ul  id="menu_cat_misc_monitoring" class="dropdown-menu">
@@ -69,18 +71,18 @@
                 <ul  id="menu_cat_misc_list" class="dropdown-menu">
                     <li><a href="showCrushMap.html" title="a visualization of the Crush Map">Crush map</a></li>
                     <li><a href="erasureProfiles.html" title="erasure profiles management">Erasure profiles</a>
-                    <li><a href="probes.html" title="shows if probes are still active">Probe status</a></li>
-                    <li><a href="objectLookup.html" title="shows on which OSD is or would be stored an object in a pool">Object lookup</a></li>
+                    <!--li><a href="probes.html" title="shows if probes are still active">Probe status</a></li-->
+                    <!--li><a href="objectLookup.html" title="shows on which OSD is or would be stored an object in a pool">Object lookup</a></li-->
                 </ul>
             </li>
             <li id="menu_cat_logout" class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#" title="">Logged as {{conf.username}}<span class="caret"></span></a>
                 <ul  id="menu_cat_logout_list" class="dropdown-menu">
-                    <li ng-show="hasRole('admin')"><a href="inkscopeConfig.html" title="show inkscope configuration">Inkscope config</a></li>
-                    <li ng-show="hasRole('admin')"><a href="inkscope_userManagement.html" title="inkscope access control">Inkscope user management</a></li>
+                    <li ng-show="hasRole('admin')"><a href="inkscopeConfig.html" title="show inkscope configuration">Config</a></li>
+                    <li ng-show="hasRole('admin')"><a href="inkscope_userManagement.html" title="inkscope access control">User management</a></li>
                     <!--li><a href="inkscope_userChangePassword.html" title="log out">Change password</a></li-->
                     <li><a href="../inkscopeCtrl/logout" title="log out">Logout</a></li>
                     <li><hr></li>
-                    <li><a href="about.html" title="about Inkscope">About Inkscope</a></li></li>
+                    <!--li><a href="about.html" title="about Inkscope">About Inkscope</a></li-->
                 </ul>
             </li>
         </ul>

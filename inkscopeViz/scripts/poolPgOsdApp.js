@@ -5,7 +5,7 @@
 var PoolPgOsdApp = angular.module('PoolPgOsdApp', ['InkscopeCommons']);
 
 PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $location, $window) {
-    var apiURL = '/ceph-rest-api/';
+    var apiURL = '/inkscopeCtrl/ceph-rest-api/';
     var myTimer;
 
     var w = window, d = document, e = d.documentElement, g = d.getElementsByTagName('body')[0];
@@ -89,7 +89,8 @@ PoolPgOsdApp.controller("poolPgOsdCtrl", function ($scope, $http, $location, $wi
            .success(function (data, status) {
                 var nodeUid = 0;
                 // fetching pg list and relation with osd
-                var pg_stats = data.output.pg_stats;
+                // var pg_stats = data.output.pg_stats;
+                var pg_stats = data.pg_stats;
 
                 $http({method: "get", url: apiURL + "osd/dump.json"})
                     .success(function (data, status) {
